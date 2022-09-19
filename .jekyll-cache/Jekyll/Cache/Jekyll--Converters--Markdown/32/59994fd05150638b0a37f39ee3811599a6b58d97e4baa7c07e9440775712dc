@@ -1,0 +1,246 @@
+I"?<h1 id="linear-regression">Linear Regression</h1>
+<p>Many types of mathematical functions are used to model or describe phenomena
+we observe around us. The simplest and most intuitive function is the
+linear function</p>
+
+\[y = \beta_0 + \beta_1x\]
+
+<p>which attempts to relate two variables, \(x\) and \(y\), by
+a linear relationship with parameters \(\beta_0\) and \(\beta_1\). Our model
+allows us to plug in suitable values for \(x\) (or \(y\)) and returns a
+unique and unambiguous prediction for the value of \(y\) (or \(x\)). A model
+containing this characteristic is what’s called a deterministic model.</p>
+
+<h1 id="deterministic-vs-probablistic-models">Deterministic vs Probablistic Models</h1>
+<p>When a physicist is interested in calculating the force needed to accelerate
+an object with some fixed mass they use Newton’s second law</p>
+
+\[F = m \cdot a\]
+
+<p><img src="/assets/img/linreg/force-acceleration.png" alt="F=ma" />
+which (practically speaking) gives us an exact value for the force given
+some value for acceleration we plug into our function (i.e. is a deterministic
+model).</p>
+
+<p>This differs from a probabilistic model which <strong>does</strong> allow some error in
+predicting \(y\). Consider the following plot.
+<img src="/assets/img/linreg/prob-plot.png" alt="data with error" />
+It is clear that as \(x\) increases, we <strong>expect</strong> \(y\) to also increase according
+to some linear factor. However, there is some <strong>error</strong> in our prediction for \(y\).
+In this scenario we can repeatedly sample a value for some value of \(x\), say 4,
+and for each sample we will get different values of \(y\). We can model this using a
+probabilistic model.</p>
+
+<h2 id="probabilistic-models">Probabilistic Models</h2>
+<p>To model a probabilistic phenomena we need to incorporate error or deviations into
+our formula so that we can better understand how we can go about fitting our model
+as well as interpreting it.</p>
+
+\[Y = \beta_0 + \beta_1x + \epsilon.\]
+
+<p>Here \(\epsilon\) is a random variable denoting our error (note \(y\) becomes \(Y\)
+signifying that it is now being treated not as an ordinary variable but as a <em>random</em>
+variable). In this situation, instead of modelling \(Y\) as a linear function of
+\(x\), we can model the expectation of \(Y\) given some value \(x\), denoted
+\(E[Y|X=x]\), as a linear function of \(x\) (because we are “given” \(x\) we don’t
+need to consider it as random even if in reality it may be). Under this premise
+of trying to model the expectation we can configure our model to be a deterministic
+one. That is, we can write</p>
+
+\[E[Y|X=x] = \beta_0 + \beta_1x\]
+
+<p>without any error random variable \(\epsilon\). The interpretation being that
+as \(x\) increases, the expected value of \(Y\) changes according to a linear
+coefficient \(\beta_1\) without any error (this is a much more abstract way
+of interpreting a probabilistic model, since we can not truly measure or observe
+the exact value of \(E[Y|X=x]\) like a physicist could measure force or acceleration).</p>
+
+<p>With all this in mind we can better understand what our probabilistic model
+represents. Consider a simple example like before, but instead let’s fix some values.
+Assume that, \(\beta_0=2\), \(\beta_1=1\) and the error random variable
+\(\epsilon\) is uniform distributed on the interval (-1,1).</p>
+
+\[Y = 2 + x + \epsilon\]
+
+<p><img src="/assets/img/linreg/ydomain.png" alt="line with y regions" /></p>
+
+<p>It is clear that our \(y\) data points exist in the interval (2, 9), but when we
+fix a point, say \(x=4\), the possible values of y are instead restricted to the
+interval (3,5), since the random error variable is bounded in the area (-1,1).
+Further, the error is <em>uniformly</em> distributed on this interval, meaning that all
+regions in the support (provided all these regions are equal size) are equally
+probable. So for \(Y_{|X=4}\) we obtain a density as follows.</p>
+
+<p><img src="/assets/img/linreg/uniformdensity.png" alt="uniform density" /></p>
+
+<p>This is a rather simple example, usually we assume that our error random variable
+\(\epsilon\) is normally distributed with mean 0 and standard deviation \(\sigma\).
+Thus, the error is unbounded and is more likely to be closer to the center than in
+the tails as opposed to equally probable everywhere. Using, the same parameters
+before, for \(x=4\) our density of \(Y_{|X=4}\) instead becomes the more familiar
+bell shaped density.</p>
+
+<p><img src="/assets/img/linreg/normaldensity.png" alt="normal density" /></p>
+
+<p>Notice the density is still centered around 6 since we always maintain the assumption
+that \(E[\epsilon]=0\).</p>
+<h1 id="ordinary-least-squares">Ordinary Least Squares</h1>
+<p>Now we will derive optimal predictions for our parameters \(\beta_0\) and
+\(\beta_1\) according to least squares. We will label our predictions with a “hat”,
+\(\hat{\beta_0}\) and \(\hat{\beta_1}\). Then we will use these formulas to
+fit a model on some data.</p>
+
+<h2 id="simple-linear-regression">Simple Linear Regression</h2>
+<p>In the simple linear regression case we have that</p>
+
+\[Y = \beta_0 + \beta_1x + \epsilon.\]
+
+<p>with \(\epsilon\) having 0 mean and some variance \(\sigma&gt;0\). We aim to predict
+\(\beta_0\) and \(\beta_1\) with values \(\hat{\beta_0}\) and \(\hat{\beta_1}\)
+so that we can</p>
+<ol>
+  <li>better understand the relationship between \(x\) and \(E[Y]\)</li>
+  <li>make predictions \(\hat{y}\) for a given value of \(x\).</li>
+</ol>
+
+<p>Least squares estimates the values of \(\beta_0\) and \(\beta_1\) by trying to
+minimize the squared distance between predictions \(\hat{y}\) and actual values
+\(y\). This is called the residual sum of squares or sum of squares of errors (SSE).</p>
+
+\[SSE = \sum_i{y_i - \hat{y_i}} = \sum_i{[y_i-(\hat{\beta_0}+\hat{\beta_1}x_i)]^2}\]
+
+<p>To choose the optimal values for \(\hat{\beta_0}\) and \(\hat{\beta_1}\) we can
+use calculus to optimize this function with respect to these two parameters.
+We have for \(\hat{\beta_0}\)</p>
+
+\[\frac{\partial SSE}{\partial \hat{\beta_0}} = -2\sum_i{y_i} + 2n\hat{\beta_0} + 2\hat{\beta_1}\sum_i{x_i}\]
+
+<p>and for \(\hat{\beta_1}\)</p>
+
+\[\frac{\partial SSE}{\partial \hat{\beta_1}} = -2\sum_i{y_i x_i} + 2\hat{\beta_0} \sum_i{x_i} + 2\hat{\beta_1} \sum_i{x_i^2}.\]
+
+<p>We want to minimize the total SSE which must happen at a critical point. So we set
+the partials equal to 0. For \(\hat{\beta_0}\)</p>
+
+\[0=\frac{\partial SSE}{\partial \hat{\beta_0}} = -2\sum_i{y_i} + 2n\hat{\beta_0} + 2\hat{\beta_1}\sum_i{x_i}\]
+
+<p>in which we get the following value for \(\hat{\beta_0}\)</p>
+
+\[\hat{\beta_0}= \frac{\sum_i{y_i} - \hat{\beta_1}\sum_i{x_i}}{n} = \bar{y} - \hat{\beta_1} \bar{x}\]
+
+<p>For \(\hat{\beta_1}\) we can plug in the value we found for \(\hat{\beta_0}\), and
+set to 0 to obtain the following.</p>
+
+\[0 = \sum_i{y_i x_i} + (\bar{y} - \hat{\beta_1} \bar{x}) \sum_i{x_i} + \hat{\beta_1} \sum_i{x_i^2}\]
+
+<p>Then with a little work we get our estimate.</p>
+
+\[\hat{\beta_1} (\sum_i{x_i^2} - \bar{x} \sum{x_i}) = \sum_i{y_i x_i} - \bar{y} \sum_i{x_i} \\
+\hat{\beta_1} = \frac{\sum_i{y_i x_i} - \bar{y} \sum_i{x_i}}{\sum_i{x_i^2} - n \bar{x}^2} \\
+\hat{\beta_1} = \frac{\sum_i{y_i x_i} - \bar{y} \sum_i{x_i} - \bar{y} \sum{x_i} + \bar{y} \sum_i{x_i}}{\sum_i{x_i^2} - n \bar{x}^2 - n \bar{x}^2 + n \bar{x}}^2 \\
+\hat{\beta_1} = \frac{\sum_i{y_i x_i} - \bar{y} \sum_i{x_i} - \bar{x} \sum{y_i} + n \bar{x} \bar{y}}{\sum_i{x_i^2} - 2 \bar{x} \sum_i{x_i} + n \bar{x}^2} \\
+\hat{\beta_1} = \frac{\sum_i{(y_i - \bar{y}) (x_i - \bar{x})}}{\sum_i{(x_i - \bar{x})^2}}\]
+
+<p>Here we have obtained the unique critical point, now we need to ensure that this choice
+\((\hat{\beta_0}, \hat{\beta_1})\) is a local minimum (and thus a global minimum).
+We can do this by checking the second partial derivatives.</p>
+
+\[\frac{\partial SSE}{\partial^2 \hat{\beta_0}} = 2n \\
+\frac{\partial SSE}{\partial^2 \hat{\beta_1}} = 2\sum_i{x_i^2} \\
+\frac{\partial SSE}{\partial \hat{\beta_0} \partial \hat{\beta_1}} = 2 \sum_i{x_i}\]
+
+<p>First we have that \(\frac{\partial SSE}{\partial^2 \hat{\beta_0}}&gt;0\), then we can show that</p>
+
+\[(\frac{\partial SSE}{\partial^2 \hat{\beta_0}}) (\frac{\partial SSE}{\partial^2 \hat{\beta_1}}) - (\frac{\partial SSE}{\partial \hat{\beta_0} \partial \hat{\beta_1}})^2= 4n \sum_i{x_i^2} - 4 (\sum_i{x_i^2}) \\
+= 4n (\sum_i{x_i^2} - \bar{x} \sum_i{x_i}) = 4n(\sum_i{(x_i - \bar{x})^2}) &gt; 0.\]
+
+<p>Thus \((\hat{\beta_0}, \hat{\beta_1})\) is a global minimum.</p>
+
+<h3 id="python-algorithm">Python Algorithm</h3>
+<p>We can create a function in python to test this result.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">simplelr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="c1"># naively compute least squares estimator
+</span>
+    <span class="c1"># compute mean of x and y
+</span>    <span class="n">y_bar</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">x_bar</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># first calculate beta 1
+</span>    <span class="n">b_1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">((</span><span class="n">y</span><span class="o">-</span><span class="n">y_bar</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">x_bar</span><span class="p">))</span> <span class="c1"># numerator first
+</span>    <span class="n">b_1</span> <span class="o">=</span> <span class="n">b_1</span><span class="o">/</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">((</span><span class="n">x</span><span class="o">-</span><span class="n">x_bar</span><span class="p">)))</span>
+
+    <span class="c1"># now beta 0 is given by
+</span>    <span class="n">b_0</span> <span class="o">=</span> <span class="n">y_bar</span> <span class="o">-</span> <span class="n">b_1</span><span class="o">*</span><span class="n">x_bar</span>
+
+    <span class="k">return</span> <span class="n">b_0</span><span class="p">,</span> <span class="n">b_1</span>
+</code></pre></div></div>
+<p>To test this algorithm I found some simple data <a href="https://college.cengage.com/mathematics/brase/understandable_statistics/7e/students/datasets/slr/frames/frame.html">here</a> relating the number of insurance claims to the total insurance payments in Sweden.</p>
+
+<p><img src="/assets/img/linreg/simplelr.png" alt="simple linear regression" /></p>
+
+<p>Here, the number of claims and the total payment were square rooted to better fit the assumption of a linear model. The key interpretation here being that the expected payments (square rooted) increase by a factor of 0.45 per claim (square rooted).</p>
+
+<h2 id="multiple-linear-regression">Multiple Linear Regression</h2>
+<p>In multiple linear regression the expectation of our random variable \(Y\) is
+modelled according to multiple covariates.</p>
+
+\[Y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_m x_m + \epsilon= \sum_{j=0}^{n}{\beta_j x_j}  + \epsilon= \vec{x}^T \beta + \epsilon\]
+
+<p>(Note we put \(x_0=1\))</p>
+
+<p>Here we represented our sum as the dot product of two vectors,
+\(\vec{x}\) which contains the covariates \((1, x_1, x_2, ... , x_m)\) and,
+\(\beta\) which contains the parameters \((\beta_0, \beta_1, ... , \beta_m)\). Then we can compute SSE as follows,</p>
+
+\[SSE = \sum_i{(y_i - \hat{y_i})^2} = \sum_i{(y_i - \vec{x}_i^T \hat{\beta)}}\]
+
+<p>which is equivalent to,</p>
+
+\[SSE = (\vec{y} - X \hat{\beta})^T (\vec{y} - X \hat{\beta})\]
+
+<p>where \(X\) is an \(n\)  x  \(m\) matrix with entry \(x_{i,j}\) equal to the j-th covariate of the the i-th sample. To obtain the least squares estimation of \(\hat{\beta}\) we first expand our equation.</p>
+
+\[SSE = \vec{y}^T \vec{y} - (\hat{\beta}^T X^T) \vec{y} - \vec{y}(X \hat{\beta}) + \hat{\beta}^T X^T X \hat{\beta} \\
+SSE = \vec{y}^T \vec{y} - 2 \hat{\beta} X^T \vec{y} + \hat{\beta}^T X^T X \hat{\beta} \\\]
+
+<p>Finally, using calculus we can minimize the SSE function by taking the derivative with respect to the vector \(\hat{\beta}\).</p>
+
+\[\frac{\partial SSE}{\partial \hat{\beta}} = -2 X^T \vec{y} + 2 X^T X \hat{\beta}\\\]
+
+<p>To obtain the value that minimizes SSE we find the critical point by setting</p>
+
+\[\frac{\partial SSE}{\partial \hat{\beta}} = 0\]
+
+<p>and then assuming the columns of \(X\) are not collinear, we can rearrange to obtain</p>
+
+\[\hat{\beta} = (X^T X)^{-1} X^T \vec{y} .\]
+
+<p>Again to check this value achieves a minimum we can use the second derivative test.</p>
+
+\[\frac{\partial^2 SSE}{\partial \hat{\beta} \partial \hat{\beta}^T} = 2 X^T X\]
+
+<p>Since \(X^T X\) is symmetric and \(X\) has linearly independent columns (by assumption)
+we conclude that \(\frac{\partial^2 SSE}{\partial \hat{\beta} \partial \hat{\beta}^T}\)
+is positive definite and thus, the least squares solution achieves a minimum.</p>
+
+<h3 id="python-algorithm-1">Python Algorithm</h3>
+<p>Again we can test this by creating a simple function in python.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">multiplelr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="c1"># naively compute least squares estimator
+</span>    <span class="c1"># ((XT)(X))^-1
+</span>    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">x</span><span class="p">))</span>
+    <span class="c1"># ((XT)(X))^-1 (XT)
+</span>    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="c1"># ((XT)(X))^-1 (XT) y
+</span>    <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">beta</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">beta</span>
+</code></pre></div></div>
+
+<p>For this I used, another <a href="&quot;https://raw.githubusercontent.com/stedy/Machine-Learning-with-R-datasets/master/insurance.csv&quot;">insurance dataset</a> containing data of insurance charges of customers. Here we tried to capture the linear relationship between the age and BMI of a customer and their insurance charge.</p>
+
+<p><img src="/assets/img/linreg/multiplelr.png" alt="multiple linear regression" /></p>
+
+<p>Since for each observation we obtain a 3-dimensional vector (age, bmi, charge) our model describes a plane mapping the age and BMI of a hypothetical customer to a predicted expected insurance charge. Here, our model claims that the expected payment increases by 242 per increase in age and 333 per increase in BMI.</p>
+:ET
