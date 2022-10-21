@@ -184,7 +184,7 @@ $$
 First we have that $$\frac{\partial SSE}{\partial^2 \hat{\beta_0}}>0$$, then we can show that
 
 $$
-(\frac{\partial SSE}{\partial^2 \hat{\beta_0}}) (\frac{\partial SSE}{\partial^2 \hat{\beta_1}}) - (\frac{\partial SSE}{\partial \hat{\beta_0} \partial \hat{\beta_1}})^2= 4n \sum_i{x_i^2} - 4 (\sum_i{x_i^2}) \\
+(\frac{\partial SSE}{\partial^2 \hat{\beta_0}}) (\frac{\partial SSE}{\partial^2 \hat{\beta_1}}) - (\frac{\partial SSE}{\partial \hat{\beta_0} \partial \hat{\beta_1}})^2= 4n \sum_i{x_i^2} - 4 (\sum_i{x_i})^2 \\
 = 4n (\sum_i{x_i^2} - \bar{x} \sum_i{x_i}) = 4n(\sum_i{(x_i - \bar{x})^2}) > 0.
 $$
 
